@@ -1,0 +1,1 @@
+export default { content: ['./index.html', './src/**/*.{js,jsx}'], theme: { extend: { colors: { brown: '#241206', orange: '#DE7115', green: '#0A5A1E', gold: '#F69B10', offwhite: '#FDFCFA' }, fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Space Grotesk', 'sans-serif'] } } }, plugins: [] };
