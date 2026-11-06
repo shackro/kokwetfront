@@ -101,7 +101,32 @@ export default function SiteContentEditor({ token }) {
 
   return (
     <form onSubmit={save} className="space-y-5">
-      <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+      <section className="rounded-2xl border border-green/15 bg-green/5 p-5 sm:p-6">
+        <h2 className="font-display text-xl font-bold text-brown">Edit pages without code</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-brown/65">
+          Choose a section below to update the words, links, photos or videos shown to visitors.
+          Image and video fields include a preview and can use an upload or an HTTPS link.
+          Save your changes when you are finished. Impact and Roadmap have their own tabs in the Control Room.
+        </p>
+        <nav className="mt-4 flex flex-wrap gap-2" aria-label="Page content sections">
+          {[
+            ['page-global', 'Header & footer'],
+            ['page-home-hero', 'Homepage hero & shield'],
+            ['page-community', 'Community spotlight'],
+            ['page-artists', 'Featured artists'],
+            ['page-enterprises', 'Homepage cards'],
+            ['page-join', 'Join section'],
+            ['page-services', 'Services & marketplace'],
+            ['page-houses', 'House profiles'],
+          ].map(([id, label]) => (
+            <a key={id} href={`#${id}`} className="rounded-full border border-brown/10 bg-white px-3 py-2 text-[10px] font-bold text-brown hover:border-green/40 hover:text-green">
+              {label}
+            </a>
+          ))}
+        </nav>
+      </section>
+
+      <section id="page-global" className="scroll-mt-24 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 flex items-center gap-3 border-b border-brown/10 pb-4">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-green/10 text-green"><Shield size={19}/></span>
           <div>
@@ -132,7 +157,7 @@ export default function SiteContentEditor({ token }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+      <section id="page-home-hero" className="scroll-mt-24 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 border-b border-brown/10 pb-4">
           <h2 className="font-display text-xl font-bold text-brown sm:text-2xl">Homepage hero and shield</h2>
           <p className="mt-1 text-xs text-brown/55">For every editable image or video, paste an HTTPS URL or upload a file. Shield layout stays fixed; only its content and images change.</p>
@@ -193,7 +218,7 @@ export default function SiteContentEditor({ token }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+      <section id="page-community" className="scroll-mt-24 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 border-b border-brown/10 pb-4">
           <h2 className="font-display text-xl font-bold text-brown sm:text-2xl">Homepage community spotlight</h2>
           <p className="mt-1 text-xs text-brown/55">Update the spotlight, mission points, community roles and pathways shown on the homepage.</p>
@@ -286,7 +311,7 @@ export default function SiteContentEditor({ token }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+      <section id="page-artists" className="scroll-mt-24 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 border-b border-brown/10 pb-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -310,7 +335,7 @@ export default function SiteContentEditor({ token }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+      <section id="page-enterprises" className="scroll-mt-24 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 border-b border-brown/10 pb-4">
           <h2 className="font-display text-xl font-bold text-brown sm:text-2xl">Homepage sections and enterprise showcase</h2>
           <p className="mt-1 text-xs text-brown/55">Update section headings, descriptions and published enterprise cards.</p>
@@ -350,7 +375,7 @@ export default function SiteContentEditor({ token }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+      <section id="page-join" className="scroll-mt-24 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 border-b border-brown/10 pb-4">
           <h2 className="font-display text-xl font-bold text-brown sm:text-2xl">Homepage join and onboarding</h2>
           <p className="mt-1 text-xs text-brown/55">Cohort names are fixed to backend-supported options; descriptions can be edited.</p>
@@ -377,7 +402,7 @@ export default function SiteContentEditor({ token }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+      <section id="page-services" className="scroll-mt-24 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 border-b border-brown/10 pb-4">
           <h2 className="font-display text-xl font-bold text-brown sm:text-2xl">Services and marketplace pages</h2>
           <p className="mt-1 text-xs text-brown/55">Catalog records (events, passes and inventory) have a separate Events & tickets editor.</p>
@@ -451,7 +476,7 @@ export default function SiteContentEditor({ token }) {
         </fieldset>
       </section>
 
-      <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+      <section id="page-houses" className="scroll-mt-24 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 border-b border-brown/10 pb-4">
           <h2 className="font-display text-xl font-bold text-brown sm:text-2xl">Nine Houses profiles</h2>
           <p className="mt-1 text-xs text-brown/55">House names stay fixed; admins can update each description, homeland and dialect text.</p>
