@@ -17,19 +17,42 @@ export default function MarketplacePage() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [eventError, setEventError] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [initialPassId, setInitialPassId] = useState(null);
   const { content } = useSiteContent();
   const pageContent = content?.marketplace || defaultPageContent;
 
   useEffect(() => {
-    Promise.all([getJson('/passes'), getJson('/activities')])
-      .then(([availablePasses, activities]) => {
-        setPasses(availablePasses);
+    let active = true;
+
+    getJson('/passes')
+      .then((availablePasses) => {
+        if (active) setPasses(availablePasses);
+      })
+      .catch(error => {
+        if (active) {
+          setLoadError(error instanceof Error ? error.message : 'Unable to load available passes.');
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    getJson('/activities')
+      .then((activities) => {
+        if (!active) return;
         setEvent(activities.find(item => item.is_main_event) || null);
       })
-      .catch(error => setLoadError(error instanceof Error ? error.message : 'Unable to load ticket options'))
-      .finally(() => setLoading(false));
+      .catch(error => {
+        if (active) {
+          setEventError(error instanceof Error ? error.message : 'Unable to load festival event details.');
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   function openTickets(passId = null) {
@@ -47,8 +70,11 @@ export default function MarketplacePage() {
         <div className="mx-auto max-w-7xl">
           <SectionTitle eyebrow={pageContent.eyebrow} title={pageContent.title} copy={pageContent.description} />
           {loadError && <p className="mt-8 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{loadError}</p>}
+          {eventError && !loadError && <p className="mt-4 text-sm text-brown/60" role="status">Passes are available, but festival event details could not be loaded.</p>}
           {loading ? (
             <p className="mt-8 text-sm text-brown/60" role="status">Loading available passes…</p>
+          ) : loadError ? null : passes.length === 0 ? (
+            <p className="mt-8 text-sm text-brown/60" role="status">No passes are currently available. Please check back soon.</p>
           ) : (
             <>
               <div className="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
