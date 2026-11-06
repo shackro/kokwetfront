@@ -7,7 +7,7 @@ import {
   Mountain,
   Shield,
 } from 'lucide-react';
-import { getJson, postJson } from '../api';
+import { getJson, postJson, resolveMediaUrl } from '../api';
 
 const phaseIcons = [Flame, Shield, Mountain];
 const phaseStatus = {
@@ -71,11 +71,17 @@ export default function RoadmapPage() {
   return (
     <div className="roadmap-page">
       <section className="roadmap-hero">
+        {roadmap.hero_image_url && (
+          <>
+            <img src={resolveMediaUrl(roadmap.hero_image_url)} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover"/>
+            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-brown/95 via-brown/80 to-brown/55"/>
+          </>
+        )}
         <div className="roadmap-hero-inner">
           <span className="roadmap-eyebrow">{roadmap.eyebrow}</span>
           <h1>{roadmap.title}<br/><span>{roadmap.highlight}</span></h1>
           <p>{roadmap.introduction}</p>
-          <a className="roadmap-scroll-link" href="#roadmap-phases">Explore the journey <ArrowRight size={16}/></a>
+          <a className="roadmap-scroll-link" href="#roadmap-phases">{roadmap.hero_cta_label} <ArrowRight size={16}/></a>
         </div>
         <div className="roadmap-hero-mark" aria-hidden="true">
           <div className="roadmap-hero-ring roadmap-hero-ring-one"/>
@@ -86,8 +92,8 @@ export default function RoadmapPage() {
 
       <section className="roadmap-journey" id="roadmap-phases">
         <header className="roadmap-section-heading">
-          <span className="roadmap-section-kicker">A shared direction</span>
-          <h2>One step, <span>together.</span></h2>
+          <span className="roadmap-section-kicker">{roadmap.journey_eyebrow}</span>
+          <h2>{roadmap.journey_title_first} <span>{roadmap.journey_title_highlight}</span></h2>
           <p>{roadmap.status_note}</p>
         </header>
 
@@ -100,6 +106,7 @@ export default function RoadmapPage() {
                   <span>{String(index + 1).padStart(2, '0')}</span>
                 </div>
                 <div className="roadmap-phase-card">
+                  {phase.image_url && <img src={resolveMediaUrl(phase.image_url)} alt="" aria-hidden="true" loading="lazy" className="mb-4 h-40 w-full rounded-lg object-cover"/>}
                   <div className="roadmap-phase-topline">
                     <span className="roadmap-phase-icon"><Icon size={20}/></span>
                     <span className={`roadmap-status roadmap-status-${phase.status}`}>{phaseStatus[phase.status]}</span>
@@ -121,13 +128,13 @@ export default function RoadmapPage() {
 
       <section className="roadmap-feedback">
         <div className="roadmap-feedback-copy">
-          <span className="roadmap-eyebrow">Your voice matters</span>
+          <span className="roadmap-eyebrow">{roadmap.feedback_eyebrow}</span>
           <h2>{roadmap.feedback_title}</h2>
           <p>{roadmap.feedback_description}</p>
         </div>
         <div className="roadmap-feedback-form">
           {done ? (
-            <p role="status" className="roadmap-feedback-success"><CheckCircle2 size={20}/> Thank you. Your voice was recorded.</p>
+            <p role="status" className="roadmap-feedback-success"><CheckCircle2 size={20}/> {roadmap.feedback_success_message}</p>
           ) : (
             <form onSubmit={submit}>
               <label htmlFor="roadmap-feedback-message">{roadmap.feedback_prompt}</label>
@@ -138,12 +145,12 @@ export default function RoadmapPage() {
                 maxLength={500}
                 value={message}
                 onChange={event => setMessage(event.target.value)}
-                placeholder="Share an idea or priority…"
+                placeholder={roadmap.feedback_placeholder}
               />
               {submitError && <p role="alert" className="roadmap-feedback-error">{submitError}</p>}
               <div className="roadmap-feedback-submit">
                 <span>{message.length}/500 characters</span>
-                <button disabled={busy}>{busy ? 'Sending…' : 'Send feedback'} <ArrowRight size={16}/></button>
+                <button disabled={busy}>{busy ? 'Sending…' : roadmap.feedback_button_label} <ArrowRight size={16}/></button>
               </div>
             </form>
           )}

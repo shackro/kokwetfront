@@ -176,7 +176,7 @@ export default function StaffPage() {
     ...(canScanTickets ? [{ id: 'gate', label: 'Gate scanning', icon: Ticket }] : []),
     ...(canManageTeam ? [
     { id: 'catalog', label: 'Events & tickets', icon: CalendarDays },
-    { id: 'site-content', label: 'Site content', icon: Shield },
+    { id: 'site-content', label: 'Pages & media', icon: Shield },
     { id: 'roadmap', label: 'Roadmap', icon: Map },
     { id: 'team', label: 'Staff access', icon: Users },
     ] : []),
@@ -636,6 +636,10 @@ export default function StaffPage() {
     event.preventDefault();
     setError('');
     setNotice('');
+    if (mediaUploadCount > 0) {
+      setError('Wait for page image uploads to finish before saving.');
+      return;
+    }
     setBusy(true);
     try {
       const saved = await staffRequest('/v1/staff/impact', token, { method: 'PUT', body: impactForm });
@@ -669,6 +673,10 @@ export default function StaffPage() {
     event.preventDefault();
     setError('');
     setNotice('');
+    if (mediaUploadCount > 0) {
+      setError('Wait for page image uploads to finish before saving.');
+      return;
+    }
     setBusy(true);
     try {
       const saved = await staffRequest('/v1/staff/roadmap', token, { method: 'PUT', body: roadmapForm });
@@ -827,6 +835,7 @@ export default function StaffPage() {
                     <input required maxLength={maxLength} value={impactForm.hero[field]} onChange={(event) => updateImpactHero(field, event.target.value)} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal outline-none focus:border-green"/>
                   </label>
                 ))}
+                <StaffMediaInput token={token} label="Impact hero image" value={impactForm.hero.image_url} onChange={(value) => updateImpactHero('image_url', value)} onUploadStateChange={onMediaUploadStateChange} disabled={busy}/>
                 <label className="block text-xs font-bold sm:col-span-2">Introduction
                   <textarea required minLength={20} maxLength={800} rows={3} value={impactForm.hero.body} onChange={(event) => updateImpactHero('body', event.target.value)} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6 outline-none focus:border-green"/>
                 </label>
@@ -834,6 +843,20 @@ export default function StaffPage() {
             </Panel>
 
             <Panel title="Ways to contribute" icon={Users}>
+              <div className="mb-5 grid gap-4 rounded-xl border border-brown/10 p-4 sm:grid-cols-2">
+                <label className="block text-xs font-bold">Section eyebrow
+                  <input required minLength={2} maxLength={80} value={impactForm.pathways_eyebrow} onChange={(event) => setImpactForm(current => ({ ...current, pathways_eyebrow: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold">Heading first part
+                  <input required minLength={2} maxLength={100} value={impactForm.pathways_title_first} onChange={(event) => setImpactForm(current => ({ ...current, pathways_title_first: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold">Highlighted heading
+                  <input required minLength={2} maxLength={100} value={impactForm.pathways_title_highlight} onChange={(event) => setImpactForm(current => ({ ...current, pathways_title_highlight: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold sm:col-span-2">Section description
+                  <textarea required minLength={10} maxLength={500} rows={2} value={impactForm.pathways_copy} onChange={(event) => setImpactForm(current => ({ ...current, pathways_copy: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
+                </label>
+              </div>
               <div className="space-y-4">
                 {impactForm.pathways.map((pathway) => (
                   <article key={pathway.id} className="rounded-xl border border-brown/10 p-4 sm:p-5">
@@ -847,6 +870,7 @@ export default function StaffPage() {
                       <label className="block text-xs font-bold sm:col-span-2">Description
                         <textarea required minLength={10} maxLength={350} rows={2} value={pathway.description} onChange={(event) => updateImpactPathway(pathway.id, { description: event.target.value })} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
                       </label>
+                      <StaffMediaInput token={token} label={`${pathway.title || 'Pathway'} card image`} value={pathway.image_url} onChange={(value) => updateImpactPathway(pathway.id, { image_url: value })} onUploadStateChange={onMediaUploadStateChange} disabled={busy}/>
                       <label className="block text-xs font-bold">Button destination
                         <select value={pathway.destination} onChange={(event) => updateImpactPathway(pathway.id, { destination: event.target.value })} className="mt-1.5 w-full rounded-lg border border-brown/15 bg-white px-3 py-2.5 text-sm font-normal">
                           <option value="open_hearth">Kokwet Voice Circle</option>
@@ -873,17 +897,38 @@ export default function StaffPage() {
                     </div>
                   </article>
                 ))}
-                <button type="button" disabled={impactForm.pathways.length >= 8} onClick={() => setImpactForm(current => ({ ...current, pathways: [...current.pathways, { id: contentId('pathway'), title: '', description: '', actions: [''], cta_label: '', destination: 'none' }] }))} className="inline-flex items-center gap-2 rounded-lg border border-green/25 px-4 py-2.5 text-xs font-bold text-green disabled:opacity-40"><Plus size={15}/> Add contribution pathway</button>
+                <button type="button" disabled={impactForm.pathways.length >= 8} onClick={() => setImpactForm(current => ({ ...current, pathways: [...current.pathways, { id: contentId('pathway'), title: '', description: '', actions: [''], cta_label: '', destination: 'none', image_url: '' }] }))} className="inline-flex items-center gap-2 rounded-lg border border-green/25 px-4 py-2.5 text-xs font-bold text-green disabled:opacity-40"><Plus size={15}/> Add contribution pathway</button>
               </div>
             </Panel>
 
             <Panel title="Resource transparency" icon={Shield}>
               <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block text-xs font-bold">Eyebrow label
+                  <input required minLength={2} maxLength={80} value={impactForm.accountability_label} onChange={(event) => setImpactForm(current => ({ ...current, accountability_label: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold">Resource card label
+                  <input required minLength={2} maxLength={100} value={impactForm.resource_reporting_label} onChange={(event) => setImpactForm(current => ({ ...current, resource_reporting_label: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
                 <label className="block text-xs font-bold">Section title
                   <input required minLength={3} maxLength={120} value={impactForm.transparency.title} onChange={(event) => updateImpactTransparency('title', event.target.value)} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
                 </label>
                 <label className="block text-xs font-bold">What visitors should know
                   <textarea required minLength={20} maxLength={800} rows={3} value={impactForm.transparency.body} onChange={(event) => updateImpactTransparency('body', event.target.value)} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
+                </label>
+                <label className="block text-xs font-bold">Unpublished report title
+                  <input required minLength={3} maxLength={120} value={impactForm.unpublished_report_title} onChange={(event) => setImpactForm(current => ({ ...current, unpublished_report_title: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold">Unpublished report note
+                  <textarea required minLength={10} maxLength={300} rows={2} value={impactForm.unpublished_report_body} onChange={(event) => setImpactForm(current => ({ ...current, unpublished_report_body: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
+                </label>
+                <label className="block text-xs font-bold">Supporting report link label
+                  <input required minLength={2} maxLength={100} value={impactForm.report_link_label} onChange={(event) => setImpactForm(current => ({ ...current, report_link_label: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold">Empty resource card title
+                  <input required minLength={3} maxLength={120} value={impactForm.resource_empty_title} onChange={(event) => setImpactForm(current => ({ ...current, resource_empty_title: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold">Empty resource card description
+                  <textarea required minLength={10} maxLength={300} rows={2} value={impactForm.resource_empty_body} onChange={(event) => setImpactForm(current => ({ ...current, resource_empty_body: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
                 </label>
                 <label className="block text-xs font-bold">Reporting status
                   <select value={impactForm.transparency.report_mode} onChange={(event) => updateImpactTransparency('report_mode', event.target.value)} className="mt-1.5 w-full rounded-lg border border-brown/15 bg-white px-3 py-2.5 text-sm font-normal">
@@ -924,9 +969,17 @@ export default function StaffPage() {
             </Panel>
 
             <Panel title="Goals and milestones" icon={Check}>
-              <label className="block max-w-2xl text-xs font-bold">Section heading
-                <input required minLength={3} maxLength={120} value={impactForm.goals_heading} onChange={(event) => setImpactForm(current => ({ ...current, goals_heading: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
-              </label>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block text-xs font-bold">Section eyebrow
+                  <input required minLength={2} maxLength={80} value={impactForm.goals_eyebrow} onChange={(event) => setImpactForm(current => ({ ...current, goals_eyebrow: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold">Section heading
+                  <input required minLength={3} maxLength={120} value={impactForm.goals_heading} onChange={(event) => setImpactForm(current => ({ ...current, goals_heading: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold sm:col-span-2">Section description
+                  <textarea required minLength={10} maxLength={300} rows={2} value={impactForm.goals_body} onChange={(event) => setImpactForm(current => ({ ...current, goals_body: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
+                </label>
+              </div>
               <div className="mt-4 space-y-3">
                 {impactForm.goals.map((goal) => (
                   <article key={goal.id} className="grid gap-3 rounded-xl border border-brown/10 p-4 sm:grid-cols-[1fr_1fr_auto]">
@@ -953,7 +1006,7 @@ export default function StaffPage() {
             </Panel>
 
             <div className="sticky bottom-3 z-10 flex justify-end">
-              <button type="submit" disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-green px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-lg disabled:opacity-60"><Save size={16}/>{busy ? 'Saving…' : 'Save impact page'}</button>
+              <button type="submit" disabled={busy || mediaUploadCount > 0} className="inline-flex items-center gap-2 rounded-xl bg-green px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-lg disabled:opacity-60"><Save size={16}/>{busy ? 'Saving…' : mediaUploadCount ? 'Uploading images…' : 'Save impact page'}</button>
             </div>
           </form>
         )}
@@ -991,6 +1044,10 @@ export default function StaffPage() {
                     <input required maxLength={maxLength} value={roadmapForm[field]} onChange={event => setRoadmapForm(current => ({ ...current, [field]: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
                   </label>
                 ))}
+                <StaffMediaInput token={token} label="Roadmap hero image" value={roadmapForm.hero_image_url} onChange={(value) => setRoadmapForm(current => ({ ...current, hero_image_url: value }))} onUploadStateChange={onMediaUploadStateChange} disabled={busy}/>
+                <label className="block text-xs font-bold">Hero button label
+                  <input required minLength={2} maxLength={80} value={roadmapForm.hero_cta_label} onChange={event => setRoadmapForm(current => ({ ...current, hero_cta_label: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
                 <label className="block text-xs font-bold sm:col-span-2">Introduction
                   <textarea required minLength={20} maxLength={800} rows={3} value={roadmapForm.introduction} onChange={event => setRoadmapForm(current => ({ ...current, introduction: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
                 </label>
@@ -998,6 +1055,21 @@ export default function StaffPage() {
                   <textarea required minLength={10} maxLength={300} rows={2} value={roadmapForm.status_note} onChange={event => setRoadmapForm(current => ({ ...current, status_note: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
                   <span className="mt-1 block text-[10px] font-normal text-brown/55">Explain how to interpret phase statuses. Avoid unsupported progress percentages.</span>
                 </label>
+              </div>
+            </Panel>
+
+            <Panel title="Roadmap section components" icon={Map}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {[
+                  ['journey_eyebrow', 'Journey eyebrow', 80],
+                  ['journey_title_first', 'Journey heading first part', 80],
+                  ['journey_title_highlight', 'Journey heading highlight', 80],
+                  ['feedback_eyebrow', 'Feedback eyebrow', 80],
+                ].map(([field, label, maxLength]) => (
+                  <label key={field} className="block text-xs font-bold">{label}
+                    <input required minLength={2} maxLength={maxLength} value={roadmapForm[field]} onChange={event => setRoadmapForm(current => ({ ...current, [field]: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                  </label>
+                ))}
               </div>
             </Panel>
 
@@ -1023,6 +1095,7 @@ export default function StaffPage() {
                       <label className="block text-xs font-bold sm:col-span-2">Description
                         <textarea required minLength={20} maxLength={600} rows={3} value={phase.description} onChange={event => updateRoadmapPhase(phase.id, { description: event.target.value })} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal leading-6"/>
                       </label>
+                      <StaffMediaInput token={token} label={`${phase.title || 'Phase'} image`} value={phase.image_url} onChange={(value) => updateRoadmapPhase(phase.id, { image_url: value })} onUploadStateChange={onMediaUploadStateChange} disabled={busy}/>
                       <label className="block text-xs font-bold">Public status
                         <select value={phase.status} onChange={event => updateRoadmapPhase(phase.id, { status: event.target.value })} className="mt-1.5 w-full rounded-lg border border-brown/15 bg-white px-3 py-2.5 text-sm font-normal">
                           <option value="planned">Planned</option>
@@ -1045,12 +1118,21 @@ export default function StaffPage() {
                     </div>
                   </article>
                 ))}
-                <button type="button" disabled={roadmapForm.phases.length >= 8} onClick={() => setRoadmapForm(current => ({ ...current, phases: [...current.phases, { id: contentId('phase'), title: '', subtitle: '', description: '', status: 'planned', milestones: [''] }] }))} className="inline-flex items-center gap-2 rounded-lg border border-green/25 px-4 py-2.5 text-xs font-bold text-green disabled:opacity-40"><Plus size={15}/> Add phase</button>
+                <button type="button" disabled={roadmapForm.phases.length >= 8} onClick={() => setRoadmapForm(current => ({ ...current, phases: [...current.phases, { id: contentId('phase'), title: '', subtitle: '', description: '', status: 'planned', milestones: [''], image_url: '' }] }))} className="inline-flex items-center gap-2 rounded-lg border border-green/25 px-4 py-2.5 text-xs font-bold text-green disabled:opacity-40"><Plus size={15}/> Add phase</button>
               </div>
             </Panel>
 
             <Panel title="Community feedback panel" icon={Users}>
               <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block text-xs font-bold">Feedback success message
+                  <input required minLength={5} maxLength={160} value={roadmapForm.feedback_success_message} onChange={event => setRoadmapForm(current => ({ ...current, feedback_success_message: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold">Feedback submit button label
+                  <input required minLength={2} maxLength={80} value={roadmapForm.feedback_button_label} onChange={event => setRoadmapForm(current => ({ ...current, feedback_button_label: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
+                <label className="block text-xs font-bold sm:col-span-2">Feedback placeholder
+                  <input required minLength={2} maxLength={120} value={roadmapForm.feedback_placeholder} onChange={event => setRoadmapForm(current => ({ ...current, feedback_placeholder: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
+                </label>
                 <label className="block text-xs font-bold">Heading
                   <input required minLength={3} maxLength={100} value={roadmapForm.feedback_title} onChange={event => setRoadmapForm(current => ({ ...current, feedback_title: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-brown/15 px-3 py-2.5 text-sm font-normal"/>
                 </label>
@@ -1064,7 +1146,7 @@ export default function StaffPage() {
             </Panel>
 
             <div className="sticky bottom-3 z-10 flex justify-end">
-              <button type="submit" disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-green px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-lg disabled:opacity-60"><Save size={16}/>{busy ? 'Saving…' : 'Save roadmap'}</button>
+              <button type="submit" disabled={busy || mediaUploadCount > 0} className="inline-flex items-center gap-2 rounded-xl bg-green px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-lg disabled:opacity-60"><Save size={16}/>{busy ? 'Saving…' : mediaUploadCount ? 'Uploading images…' : 'Save roadmap'}</button>
             </div>
           </form>
         )}

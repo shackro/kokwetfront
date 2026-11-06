@@ -10,7 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getJson } from '../api';
+import { getJson, resolveMediaUrl } from '../api';
 import SectionTitle from '../components/SectionTitle';
 
 const destinations = {
@@ -59,6 +59,12 @@ export default function ImpactPage() {
   return (
     <div className="impact-page">
       <section className="impact-hero">
+        {hero.image_url && (
+          <>
+            <img src={resolveMediaUrl(hero.image_url)} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover"/>
+            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-brown/95 via-brown/80 to-brown/55"/>
+          </>
+        )}
         <div className="impact-hero-inner">
           <span className="impact-eyebrow">{hero.eyebrow}</span>
           <h1>{hero.title}<br/><span>{hero.highlight}</span></h1>
@@ -69,9 +75,9 @@ export default function ImpactPage() {
       <section className="impact-pathways-section">
         <div className="impact-section-heading">
           <SectionTitle
-            eyebrow="A shared effort"
-            title={<>Plug into the <span className="text-green">ecosystem</span></>}
-            copy="Choose a practical way to contribute. These are invitations to take part—not claims about results already achieved."
+            eyebrow={impact.pathways_eyebrow}
+            title={<>{impact.pathways_title_first} <span className="text-green">{impact.pathways_title_highlight}</span></>}
+            copy={impact.pathways_copy}
           />
         </div>
         <div className="impact-pathway-grid">
@@ -80,6 +86,7 @@ export default function ImpactPage() {
             const destination = destinations[pathway.destination];
             return (
               <article className="impact-pathway-card" key={pathway.id}>
+                {pathway.image_url && <img src={resolveMediaUrl(pathway.image_url)} alt="" aria-hidden="true" loading="lazy" className="mb-2 h-36 w-full rounded-lg object-cover"/>}
                 <span className="impact-pathway-icon"><Icon size={22}/></span>
                 <h2>{pathway.title}</h2>
                 <p>{pathway.description}</p>
@@ -97,26 +104,26 @@ export default function ImpactPage() {
 
       <section className="impact-transparency-section">
         <div className="impact-transparency-copy">
-          <span className="impact-eyebrow impact-eyebrow-green"><ShieldCheck size={15}/> Accountability</span>
+          <span className="impact-eyebrow impact-eyebrow-green"><ShieldCheck size={15}/> {impact.accountability_label}</span>
           <h2>{transparency.title}</h2>
           <p>{transparency.body}</p>
           {!reportIsPublic ? (
             <div className="impact-report-state">
               <span className="impact-report-indicator"/>
-              <div><strong>No verified figures published</strong><p>We will show a breakdown here when a dated report and its source are ready.</p></div>
+              <div><strong>{impact.unpublished_report_title}</strong><p>{impact.unpublished_report_body}</p></div>
             </div>
           ) : (
             <div className={`impact-report-details ${reportIsVerified ? 'is-verified' : 'is-proposed'}`}>
               <span>{reportIsVerified ? 'Verified report' : 'Proposal · not actual expenditure'}</span>
               {transparency.report_period && <strong>{transparency.report_period}</strong>}
               {transparency.report_source && <p>Source: {transparency.report_source}</p>}
-              {transparency.report_url && <a href={transparency.report_url} target="_blank" rel="noopener noreferrer">Open supporting report <ArrowRight size={14}/></a>}
+              {transparency.report_url && <a href={transparency.report_url} target="_blank" rel="noopener noreferrer">{impact.report_link_label} <ArrowRight size={14}/></a>}
             </div>
           )}
         </div>
         <div className="impact-resource-card">
           <div className="impact-resource-card-heading">
-            <span>Resource reporting</span>
+            <span>{impact.resource_reporting_label}</span>
             <ShieldCheck size={19}/>
           </div>
           {reportIsPublic && transparency.allocations.length ? (
@@ -136,8 +143,8 @@ export default function ImpactPage() {
           ) : (
             <div className="impact-resource-empty">
               <span className="impact-resource-emblem"><ShieldCheck size={29}/></span>
-              <h3>Trust is built with evidence.</h3>
-              <p>There are no allocation percentages to display until a proposal or sourced report is published.</p>
+              <h3>{impact.resource_empty_title}</h3>
+              <p>{impact.resource_empty_body}</p>
             </div>
           )}
         </div>
@@ -145,9 +152,9 @@ export default function ImpactPage() {
 
       <section className="impact-goals-section">
         <div className="impact-goals-heading">
-          <span className="impact-eyebrow impact-eyebrow-green"><CircleCheck size={15}/> Looking ahead</span>
+          <span className="impact-eyebrow impact-eyebrow-green"><CircleCheck size={15}/> {impact.goals_eyebrow}</span>
           <h2>{goalsHeading}</h2>
-          <p>These priorities are updated by the Kokwet team. A status describes the plan, not a measured outcome.</p>
+          <p>{impact.goals_body}</p>
         </div>
         <div className="impact-goals-list">
           {goals.map(goal => (

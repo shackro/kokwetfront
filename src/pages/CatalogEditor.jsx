@@ -19,6 +19,7 @@ export default function CatalogEditor({ token }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busyKey, setBusyKey] = useState('');
+  const [testingDaraja, setTestingDaraja] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -123,8 +124,32 @@ export default function CatalogEditor({ token }) {
     }
   }
 
+  async function testDarajaSandbox() {
+    setTestingDaraja(true);
+    setError('');
+    setNotice('');
+    try {
+      const result = await staffRequest('/v1/staff/daraja/sandbox-check', token, { method: 'POST' });
+      setNotice(result.message);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Unable to verify Daraja sandbox.');
+    } finally {
+      setTestingDaraja(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
+      <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
+        <div>
+          <h2 className="font-display text-xl font-bold text-brown">Daraja sandbox connection</h2>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-brown/55">Verify Render’s sandbox credentials by requesting an OAuth token. This does not initiate a payment or send an STK prompt.</p>
+        </div>
+        <button type="button" disabled={testingDaraja} onClick={() => void testDarajaSandbox()} className="rounded-lg bg-green px-4 py-3 text-xs font-bold text-white disabled:opacity-50">
+          {testingDaraja ? 'Checking sandbox…' : 'Test Daraja sandbox'}
+        </button>
+        {(error || notice) && <p role={error ? 'alert' : 'status'} className={`basis-full rounded-lg px-4 py-3 text-sm ${error ? 'bg-red-50 text-red-700' : 'bg-green/5 text-green'}`}>{error || notice}</p>}
+      </section>
       <section className="rounded-2xl border border-brown/10 bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-brown/10 pb-4">
         <div>

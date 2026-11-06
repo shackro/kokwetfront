@@ -106,7 +106,7 @@ export default function SiteContentEditor({ token }) {
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-green/10 text-green"><Shield size={19}/></span>
           <div>
             <h2 className="font-display text-xl font-bold text-brown sm:text-2xl">Global contact and footer</h2>
-            <p className="mt-1 text-xs text-brown/55">These settings are public. Use the WhatsApp number in international digits, without a plus sign.</p>
+            <p className="mt-1 text-xs text-brown/55">Edit shared page components, text, navigation, logos and media from this panel. Use the WhatsApp number in international digits, without a plus sign.</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
