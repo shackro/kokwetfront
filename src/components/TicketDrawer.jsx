@@ -169,7 +169,7 @@ export default function TicketDrawer({ isOpen, onClose, passes, event, initialPa
           <div className="ticket-drawer-success" role="status">
             <Ticket size={34} aria-hidden="true" />
             <p className="ticket-drawer-eyebrow">Kokwet Festival · Ticket payment</p>
-            <h3>{order.status === 'Paid' ? 'Payment confirmed' : order.status === 'Payment pending' ? 'Approve the M-Pesa prompt' : order.status === 'Expired' ? 'Reservation expired' : order.status === 'Payment failed' ? 'Payment was not completed' : 'Payment needs support'}</h3>
+            <h3>{order.status === 'Paid' ? 'Payment confirmed' : order.status === 'Payment pending' ? 'Approve the M-Pesa prompt' : order.status === 'Expired' ? 'Reservation expired' : order.status === 'Payment cancelled' ? 'Payment was cancelled' : order.status === 'Payment failed' ? 'Payment was not completed' : 'Payment needs support'}</h3>
             <p>
               {order.status === 'Paid'
                 ? 'Your paid admission tickets are ready. Open or export them below; each QR code is valid for one gate scan.'
@@ -177,7 +177,9 @@ export default function TicketDrawer({ isOpen, onClose, passes, event, initialPa
                   ? `A KSh ${Number(order.total || totalPrice).toLocaleString()} M-Pesa prompt was sent to your phone. This reservation expires in 10 minutes; tickets appear after verified payment.`
                   : order.status === 'Expired'
                     ? 'This unpaid reservation expired and the passes returned to availability.'
-                    : order.status === 'Payment failed'
+                    : order.status === 'Payment cancelled'
+                      ? 'The M-Pesa prompt was cancelled. No ticket was issued, and the passes returned to availability.'
+                      : order.status === 'Payment failed'
                       ? 'No ticket was issued. You can start a new checkout.'
                       : 'We could not confirm the payment state. Do not retry if you received an M-Pesa prompt; contact support with the order reference below.'}
             </p>

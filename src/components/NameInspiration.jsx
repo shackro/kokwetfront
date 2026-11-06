@@ -31,7 +31,7 @@ export default function NameInspiration({ content }) {
     <section className="name-inspiration" aria-labelledby="name-inspiration-title">
       <header className="name-inspiration-header">
         <span className="name-inspiration-icon"><Sparkles size={18}/></span>
-        <p className="name-inspiration-eyebrow">{content?.name_inspiration_eyebrow || 'Interactive cultural sandbox'}</p>
+        <p className="name-inspiration-eyebrow">{content?.name_inspiration_eyebrow || 'Cultural name inspiration'}</p>
         <h2 id="name-inspiration-title">{content?.name_inspiration_title || <>Explore a name <span>inspired by the moment.</span></>}</h2>
         <p>{content?.name_inspiration_description || 'Choose a naming pattern and a circumstance to see an example name and its associated meaning.'}</p>
       </header>
