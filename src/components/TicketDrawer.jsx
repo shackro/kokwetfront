@@ -105,6 +105,13 @@ export default function TicketDrawer({ isOpen, onClose, passes, event, initialPa
     });
   }
 
+  function startAnotherOrder() {
+    setOrder(null);
+    setQuantities(initialPassId ? { [initialPassId]: 1 } : {});
+    setPhone('');
+    setError('');
+  }
+
   async function submitOrder(event) {
     event.preventDefault();
     if (!event.currentTarget.checkValidity()) {
@@ -213,12 +220,17 @@ export default function TicketDrawer({ isOpen, onClose, passes, event, initialPa
             <button
               type="button"
               onClick={() => {
-                if (order.status !== 'Payment pending') setOrder(null);
-                onClose();
+                if (order.status === 'Payment pending' || order.status === 'Payment review') {
+                  onClose();
+                  return;
+                }
+                startAnotherOrder();
               }}
               className="ticket-drawer-primary"
             >
-              {order.status === 'Payment pending' ? 'Close and check later' : 'Start another order'}
+              {order.status === 'Payment pending' || order.status === 'Payment review'
+                ? 'Close and check later'
+                : 'Buy more tickets'}
             </button>
           </div>
         ) : (
