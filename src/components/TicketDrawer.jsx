@@ -190,6 +190,11 @@ export default function TicketDrawer({ isOpen, onClose, passes, event, initialPa
                       ? 'No ticket was issued. You can start a new checkout.'
                       : 'We could not confirm the payment state. Do not retry if you received an M-Pesa prompt; contact support with the order reference below.'}
             </p>
+            {order.payment_failure_reason && (
+              <p className="text-sm text-red-700">
+                M-Pesa response{order.payment_result_code ? ` (${order.payment_result_code})` : ''}: {order.payment_failure_reason}
+              </p>
+            )}
             {order.status !== 'Paid' && <p className="text-xs text-brown/55">Order reference: <code>{order.order_id}</code></p>}
             {error && <p role="alert" className="ticket-drawer-error">{error}</p>}
             <div className="ticket-drawer-tokens">

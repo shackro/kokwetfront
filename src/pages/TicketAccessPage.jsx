@@ -102,6 +102,11 @@ export default function TicketAccessPage() {
                   ? 'Your M-Pesa payment is still processing. This page checks for confirmation automatically.'
                   : `Order status: ${order?.status || 'unknown'}. Tickets appear here only after payment confirmation.`}
             </p>
+            {order?.payment_failure_reason && (
+              <p className="mt-2 text-sm leading-6 text-red-700">
+                M-Pesa response{order.payment_result_code ? ` (${order.payment_result_code})` : ''}: {order.payment_failure_reason}
+              </p>
+            )}
           </div>
         </div>
 
