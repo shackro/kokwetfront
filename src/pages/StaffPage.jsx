@@ -1,10 +1,11 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowDown, ArrowUp, BarChart3, BookOpen, CalendarDays, Check, ChevronRight, History, LogOut, Map, MessageCircle, Mic, Plus, Save, Shield, Ticket, Trash2, Users } from 'lucide-react';
+import { ArrowDown, ArrowUp, BarChart3, BookOpen, CalendarDays, Check, ChevronRight, CreditCard, History, LogOut, Map, MessageCircle, Mic, Plus, Save, Shield, Ticket, Trash2, Users } from 'lucide-react';
 import { getJson, postJson, resolveApiUrl, staffRequest } from '../api';
 import SiteContentEditor from './SiteContentEditor';
 import LiveControlPanel from './LiveControlPanel';
 import CatalogEditor from './CatalogEditor';
+import PaymentSettingsPanel from './PaymentSettingsPanel';
 import StaffVoiceRecorder from '../components/StaffVoiceRecorder';
 import StaffMediaInput from '../components/StaffMediaInput';
 import { inspectVoiceFile } from '../audio';
@@ -180,6 +181,7 @@ export default function StaffPage() {
     { id: 'roadmap', label: 'Roadmap', icon: Map },
     { id: 'team', label: 'Staff access', icon: Users },
     ] : []),
+    ...(isSuperAdmin ? [{ id: 'payments', label: 'M-Pesa settings', icon: CreditCard }] : []),
     ...(isSuperAdmin ? [{ id: 'audit', label: 'System audit', icon: History }] : []),
   ], [canManageLive, canManageStories, canManageTeam, canManageVoices, canModerate, canScanTickets, isSuperAdmin]);
 
@@ -1013,6 +1015,7 @@ export default function StaffPage() {
 
         {activeTab === 'site-content' && canManageTeam && <SiteContentEditor token={token}/>}
         {activeTab === 'catalog' && canManageTeam && <CatalogEditor token={token}/>}
+        {activeTab === 'payments' && isSuperAdmin && <PaymentSettingsPanel token={token}/>}
         {activeTab === 'audit' && isSuperAdmin && (
           <Panel title="Super Admin activity" icon={History}>
             <p className="mb-4 text-sm leading-6 text-brown/60">Successful changes made with the Super Admin session are recorded here. Request bodies, passwords and provider secrets are never included.</p>
